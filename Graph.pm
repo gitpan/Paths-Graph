@@ -4,7 +4,7 @@ package Paths::Graph;
 @EXPORT_OK = qw/shortest_path() free_path_event() debug()/;
 
 require 5.005_62;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use strict;
 
@@ -134,6 +134,8 @@ Path::Graph - Generate paths from hash graph.
 
 =head1 SYNOPSIS
 
+=head2 Code 1
+
 #!usr/bin/perl
 
 my %graph = (
@@ -179,43 +181,64 @@ This example cover all possibilities to find the graph's paths from Node A to No
 		     (D)---7---(E)
 
 
-Matriz costs nodes              From A to C paths and costs
 
-=head1 	+---+---+---+---+---+---+---+---+     A->B->G->D->E->F->C = 27  
 
-=head1  |   | A | B | C | D | E | F | G |     A->G->B->E->F->C    = 23 
 
-=head1   +---+---+---+---+---+---+---+---+     A->G->B->C          = 12  
+=head2 Matriz costs nodes 
 
-=head1  | A |   | 1 | 4 |   |   |   | 2 |     A->B->D->E->F->C    = 17
+		-----------------  
+		|.|A|B|C|D|E|F|G| 
+		|-+-+-+-+-+-+-+-|  
+		|A|0|1|4|0|0|0|2|
+		|-+-+-+-+-+-+-+-| 
+		|B|1|0|2|1|5|9|8| 
+		|-+-+-+-+-+-+-+-| 
+		|C|4|2|0|0|0|6|0|
+		|-+-+-+-+-+-+-+-+ 
+		|D|0|1|0|0|7|0|3|
+		|-+-+-+-+-+-+-+-| 
+		|E|0|5|0|7|0|2|0|
+		|-+-+-+-+-+-+-+-| 
+		|F|0|9|6|0|2|0|0| 
+		|-+-+-+-+-+-+-+-| 
+		|G|2|8|0|3|0|0|0|
+		----------------- 
 
-=head1   +---+---+---+---+---+---+---+---+     A->G->D->E->B->C    = 19 
+=head1 From A to C paths and costs
 
-=head1 | B | 1 |   | 2 | 1 | 5 | 9 | 8 |     A->C                = 4 
+		A->B->G->D->E->F->C = 27
 
-=head1   +---+---+---+---+---+---+---+---+     A->G->D->E->B->F->C = 28 
+		A->G->B->E->F->C    = 23
 
-=head1 | C | 4 | 2 |   |   |   | 6 | 0 |     A->G->D->B->C       = 8
+		A->G->B->C          = 12
 
-=head1   +---+---+---+---+---+---+---+---+     A->B->C             = 3 
+		A->B->D->E->F->C    = 17
 
-=head1 | D |   | 1 |   |   | 7 |   | 3 |     A->G->D->B->F->C    = 21
+		A->G->D->E->B->C    = 19
 
-=head1   +---+---+---+---+---+---+---+---+     A->B->F->C          = 16 
+		A->C                = 4
 
-=head1 | E |   | 5 |   | 7 |   | 2 | 0 |     A->G->D->B->E->F->C = 19
+		A->G->D->E->B->F->C = 28
 
-=head1   +---+---+---+---+---+---+---+---+     A->G->D->E->F->C    = 18 
+		A->G->D->B->C       = 8
 
-=head1 | F |   | 9 | 6 |   | 2 |   | 0 |     A->B->D->E->F->C    = 17 
+		A->B->C             = 3
 
-=head1   +---+---+---+---+---+---+---+---+     A->G->B->D->E->F->C = 26 
+		A->G->D->B->F->C    = 21
 
-=head1 | G | 2 | 8 |   | 3 |   |   | 0 |     A->G->D->E->F->B->C = 19
+		A->B->F->C          = 16
 
-=head1   +---+---+---+---+---+---+---+---+     A->G->B->F->C       = 25 
+		A->G->D->B->E->F->C = 19
 
-=head1
+		A->G->D->E->F->C    = 18
+
+		A->B->D->E->F->C    = 17
+
+		A->G->B->D->E->F->C = 26
+
+		A->G->B->F->C       = 25
+
+		A->G->D->E->F->B->C = 19
 
 
 =head1 DESCRIPTION
@@ -234,77 +257,100 @@ Three Case how to call Object and get a good performance as following:
 
 =head2 CASE 1 $obj->shortest_path
 
-#!/usr/bin/perl
+	#!/usr/bin/perl
 
-my %graph = (
-                A => {B=>1,C=>4,G=>2},
-                B => {A=>1,C=>2,D=>1,E=>5,F=>9,G=>8},
-                C => {A=>4,B=>2,F=>6},
-                D => {B=>1,E=>7,G=>3},
-                E => {B=>5,D=>7,F=>2},
-                F => {B=>9,C=>6,E=>2},
-                G => {A=>2,B=>8,D=>3}
-);
+	my %graph = (
+			A => {B=>1,C=>4,G=>2},
 
-use Paths::Graph;
+			B => {A=>1,C=>2,D=>1,E=>5,F=>9,G=>8},
 
-my $obj = Paths::Graph->new(-origin=>"A",-destiny=>"F",-graph=>\%graph);
+			C => {A=>4,B=>2,F=>6},
 
-my @paths = $obj->shortest_path();
+			D => {B=>1,E=>7,G=>3},
 
-for my $path (@paths) {
+			E => {B=>5,D=>7,F=>2},
 
-        print "Shortest Path:" . join ("->" , @$path) . " Cost:". $obj->get_path_cost(@$path) . "\n";
+			F => {B=>9,C=>6,E=>2},
 
-}
+			G => {A=>2,B=>8,D=>3}
+
+	);
+
+	use Paths::Graph;
+
+		my $obj = Paths::Graph->new(-origin=>"A",-destiny=>"F",-graph=>\%graph);
+
+		my @paths = $obj->shortest_path();
+
+		for my $path (@paths) {
+
+			print "Shortest Path:" . join ("->" , @$path) . 
+			" Cost:". $obj->get_path_cost(@$path) . "\n";
+
+		}
 
 =head2 CASE 2 $obj->free_path_event
 
-#!/usr/bin/perl
+	#!/usr/bin/perl
 
-my %graph = (
-                A => {B=>1,C=>4,G=>2},
-                B => {A=>1,C=>2,D=>1,E=>5,F=>9,G=>8},
-                C => {A=>4,B=>2,F=>6},
-                D => {B=>1,E=>7,G=>3},
-                E => {B=>5,D=>7,F=>2},
-                F => {B=>9,C=>6,E=>2},
-                G => {A=>2,B=>8,D=>3},
-);
+	my %graph = (
 
-use Paths::Graph;
+			A => {B=>1,C=>4,G=>2},
 
-my $obj = Paths::Graph->new(-origin=>"A",-destiny=>"F",-graph=>\%graph,-sub=>\&get_paths);
+			B => {A=>1,C=>2,D=>1,E=>5,F=>9,G=>8},
 
-$obj->free_path_event();
+			C => {A=>4,B=>2,F=>6},
 
-sub get_paths {
+			D => {B=>1,E=>7,G=>3},
 
-	my ($self , @nodes) = @_;
+			E => {B=>5,D=>7,F=>2},
 
-	print join("->",@nodes) . "\n";
+			F => {B=>9,C=>6,E=>2},
 
-}
+			G => {A=>2,B=>8,D=>3},
+
+	);
+
+	use Paths::Graph;
+
+	my $obj = Paths::Graph->new(-origin=>"A",-destiny=>"F",-graph=>\%graph,-sub=>\&get_paths);
+
+	$obj->free_path_event();
+
+	sub get_paths {
+
+		my ($self , @nodes) = @_;
+
+		print join("->",@nodes) . "\n";
+
+	}
 
 =head2 CASE 3 $obj->debug()
 
-#!/usr/bin/perl
+	#!/usr/bin/perl
 
-my %graph = (
-                A => {B=>1,C=>4,G=>2},
-                B => {A=>1,C=>2,D=>1,E=>5,F=>9,G=>8},
-                C => {A=>4,B=>2,F=>6},
-                D => {B=>1,E=>7,G=>3},
-                E => {B=>5,D=>7,F=>2},
-                F => {B=>9,C=>6,E=>2},
-                G => {A=>2,B=>8,D=>3},
-);
+	my %graph = (
+			A => {B=>1,C=>4,G=>2},
 
-use Paths::Graph;
+			B => {A=>1,C=>2,D=>1,E=>5,F=>9,G=>8},
 
-my $obj = Paths::Graph->new(-origin=>"A",-destiny=>"F",-graph=>\%graph);
+			C => {A=>4,B=>2,F=>6},
 
-$obj->debug();
+			D => {B=>1,E=>7,G=>3},
+
+			E => {B=>5,D=>7,F=>2},
+
+			F => {B=>9,C=>6,E=>2},
+
+			G => {A=>2,B=>8,D=>3},
+
+	);
+
+	use Paths::Graph;
+
+	my $obj = Paths::Graph->new(-origin=>"A",-destiny=>"F",-graph=>\%graph);
+
+	$obj->debug();
 
 =head1 PARAMETERS
 
@@ -316,62 +362,75 @@ The following cases are options of how this hash operate.
 
 Note:It's not important the nodes's names  , it's only important the nodes's values. example.
 
-my %g = ( 
-	Linux => {Perl=>10,Regex=>20}
-	CPAN  => {Modules=>1,Opensource=>100} 
-);
+	my %g = ( 
+
+		Linux => {Perl=>10,Regex=>20}
+
+		CPAN  => {Modules=>1,Opensource=>100} 
+
+	);
 
 =head3 CASE 1 Directed Graph
 
 The directed graph are covered too.
 
-my %g = (
+	my %g = (
 
-	A => {B=>10,C=>20,D=>1},
-	C => {B=>25,G=>1}
+		A => {B=>10,C=>20,D=>1},
 
-); 
+		C => {B=>25,G=>1}
+
+	); 
 
 Fixed D and G do not exist , but it's fine.
 
 =head3 CASE 2 Jumper Graph
 
-my %g = (
+	my %g = (
 
-	A => {B=>1,C=>1,D=>1},
-	C => {B=>1,G=>1}
+		A => {B=>1,C=>1,D=>1},
 
-); 
+		C => {B=>1,G=>1}
+
+	); 
 
 Fixed D and G do not exist , but it's fine.
 
 or
 
-my %g = (
+	my %g = (
 
-	A => {B=>1,C=>1},
-	B => {B=>1,C=>1},
-	C => {A=>1,B=>1}
+		A => {B=>1,C=>1},
 
-); 
+		B => {B=>1,C=>1},
+
+		C => {A=>1,B=>1}
+
+	); 
 
 =head3 CASE 3 Cost Graph 
 
-my %graph = (
-                A => {B=>1,C=>4},
-                B => {A=>1,C=>2},
-                C => {A=>4,B=>2},
+	my %graph = (
 
-); 
+			A => {B=>1,C=>4},
+
+			B => {A=>1,C=>2},
+
+			C => {A=>4,B=>2},
+
+	); 
 
 The cost from A->C=4 and C->A=4
 
-my %graph = (
-                A => {B=>1,C=>1},
-                B => {A=>1,C=>2},
-                C => {A=>4,B=>2},
+	my %graph = (
 
-); 
+			A => {B=>1,C=>1},
+
+			B => {A=>1,C=>2},
+
+			C => {A=>4,B=>2},
+
+	); 
 
 The cost from A->C=1 and C->A=4
 
@@ -381,15 +440,15 @@ If the cost is distinct , it's not a problem.
 
 It's not important the order on the hash graph. 
 
-$obj->{origin} = "A";
+	$obj->{origin} = "A";
 
-$obj->{destiny} = "B";
+	$obj->{destiny} = "B";
 
 or
 
-$obj->{origin} = "A";
+	$obj->{origin} = "A";
 
-$obj->{destiny} = "A";
+	$obj->{destiny} = "A";
 
 Is not a problem if the origin and destiny nodes are equals. In this case the graph is traced from A to A.
 
@@ -402,13 +461,13 @@ $self  = some object control.
 
 Note:The values's names do not have to be necesary equals , example;
 
-$obj->{sub} = \&my_method;
+	$obj->{sub} = \&my_method;
 
-sub my_method {
+	sub my_method {
 
-	my ($obj,@nodes)  = @_ ; # good
+		my ($obj,@nodes)  = @_ ; # good
 
-}
+	}
   
 The method described above assigned its values to the object (my_method).  
 
