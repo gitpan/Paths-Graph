@@ -295,6 +295,7 @@ $obj->debug()
 
 Educational procedure traces and shows the algorithm during execution time ($obj->debug). This method shows how the algorithm is being deploy background. 
 
+
 DEBUGGING
 
 Implementation of educational procedure of the object to call the debug() method;
@@ -314,6 +315,15 @@ None by default. But can be exported if it's required.
 Please report bugs using: <cristian@codigolibre.cl>.
 
 Powerfull features in the future.
+
+HISTORY
+
+Update in 2008 problem found by Keunwan Park problem produced in search where node value is equal to '0'
+
+Thank , Keunwan Park will be contribute to perl comunity
+
+Solucionate by me ;) , update available in version 0.03
+
 
 AUTHOR
 

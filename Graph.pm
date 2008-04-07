@@ -4,7 +4,7 @@ package Paths::Graph;
 @EXPORT_OK = qw/shortest_path() free_path_event() debug()/;
 
 require 5.005_62;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use strict;
 
@@ -42,6 +42,7 @@ sub get_path_cost {
 # Famous algorithm to get all possibles paths into the graph.
 sub shortest_path {
 	my ($self,$father) = @_;
+	$father = 'zero' if $father eq '0';
 	my $tmp = $self->{sub} if $self->{sub};
 	$self->{sub} = \&push_paths;
 	$self->free_path_event($father);
@@ -62,6 +63,7 @@ sub shortest_path {
 #Execution time for feedback of the graph's paths.
 sub free_path_event {
 	my ($self , $father ) = @_;
+	$father = 'zero' if $father eq '0';
 	$father = $self->{origin} unless $father;
 	$self->{fathers}{$father}=1;
 	push @{$self->{path}} , $father;
@@ -82,6 +84,7 @@ sub free_path_event {
 #Educational method to undertand the steps to trace the graph.
 sub debug {
 	my ($self , $father ,$level) = @_;
+	$father = 'zero' if $father eq '0';
 	$level = 1 unless $level;
 	$father = $self->{origin} unless $father;
 	$self->debug_msg($level,"Node:[$father] Save node into path hash\n");
@@ -508,6 +511,15 @@ None by default. But can be exported if it's required.
 Please report bugs using: <cristian@codigolibre.cl>.
 
 Powerfull features in the future.
+
+=head1 HISTORY
+
+Update in 2008 problem found by Keunwan Park problem produced in search where node value is equal to '0'
+
+Thank , Keunwan Park will be contribute to perl comunity
+
+Solucionate by me ;) , update available in version 0.03
+
 
 =head1 AUTHOR
 
